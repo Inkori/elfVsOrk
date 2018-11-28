@@ -1,66 +1,116 @@
-let dmg = Math.floor(Math.random() * 10);
-let bow =  dmg;
-let axe = dmg;
-let health = 50;
-let registr = {
+let hitBow = Math.floor(Math.random() * 10);
+let hitAxe = Math.floor(Math.random() * 10 + 2);
+let bow = hitBow;
+let axe = hitAxe;
+let range = 3;
+let charId = {
 
 }
 let id = 0;
-class Stats  {
-	constructor (health) {
-		this.health = health;
-		this.id = id++;
-		registr[this.id] = this;	
+
+class Game {
+	constructor() {
+		id += 1;
+		this.id = id;
+		charId[this.id] = this;
+		this.raund = 0;
+
 	}
 
-	render() {
-		return `
-			<div class="hpElf">${this.health}</div>
-			<div class="hpOrk">${this.health}</div>
-			<button class="btnElf">Attack</button>
-			<button class="btnOrk">Attack</button>
-		`
-	}
-	attack(health, weapon) {
 
-		let btn = document.querySelector(".btnElf")
-		btn.addEventListener("click",  () => { 
-			if(this.state.health >= 1) {
-				this.state.health -= this.state.weapon
-			} else {
-				this.state.health = this.health
-				alert("Winer!")
-			}
-		})
-		
+	updateData() {
+		document.querySelector("#root").innerHTML =
+			`
+			<div class="raund">Your victories is ${this.raund}</div>/n
+			<div class="userName">Your class is ${this.name}</div>/n
+			<div class="health">Your health is ${this.health}</div>/n
+			<input type="button" class="attackButton" id="button${this.id}" onclick="charId[${this.id}].changeEnemy()" value="Attack"/>
+
+		`;
+
 	}
+
+
 }
 
 
+class Stats extends Game {
+	constructor() {
+		super()
+		this.health = 50;
+
+	}
+	oneHit(hit, enemy, select) {
+		this.health = this.health - hit;
+		this.updateData()
+		if (this.health <= 0) {
+			this.health = 50;
+			charId[enemy].health = 50;
+			charId[enemy].raundEnd(enemy, select);
+			this.updateData();
+		}
+	}
+
+	attack(hit, enemy, select) {
+		// this.stopAtkBtn(enemy, select)
+		charId[select].oneHit(hit, enemy, select)
+
+	}
+	changeEnemy() {
+		if (this.id === 2) {
+			this.attack(this.weapon, this.id, 1);
+		} else {
+			charId[1].attack(charId[1].weapon, this.id, 2);
+		}
+	}
+
+	raundEnd(enemy, select) {
+		enemy[select].raund += 1;
+		this.updateData();
+	}
+
+}
 
 class Elf extends Stats {
 	constructor(bow) {
 		super()
+		this.name = "Arche"
 		this.weapon = bow;
 	}
 }
 class Ork extends Stats {
 	constructor(axe) {
 		super()
+		this.name = "HeadBreaker"
 		this.weapon = axe;
+		this.orkRange = range;
 	}
 }
 
-class Game {
-	constructor (firstRace, secondRace) {
-		this.rirstRace = firstRace
-		this.secondRace = secondRace
-		
-	}
-	
-}
+
 const elf = new Elf(bow)
 const ork = new Ork(axe)
-const characters = new Stats(health)
-const newGame = new Game(elf, ork)
-document.querySelector("body").innerHTML = characters.render();
+
+elf.updateData();
+ork.updateData();
+
+
+//under development
+
+	// stopAtkBtn(enemy, select) {
+	// 	document.querySelector(`.attackButton${enemy}`).disabled = true;
+	// 	const orkRange = document.querySelector(`.attackButton${enemy[range]}`).disabled = true;
+	// 	if (orkRange == 3) {
+	// 		true;
+	// 		orkRange--
+	// 	} else if (orkRange == 0){
+	// 		OrkRange = 0;
+	// 	}
+	// }
+
+// if (this.name == "Archer") {
+// 			this.hp - this.heltheFeatureRace
+// 		} else if (this.name == "HeadBreaker") {
+// 			this.hp + this.heltheFeatureRace
+// 		}
+//
